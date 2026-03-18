@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Voice Agent for Your Business | RiftFactor</title>
+  <meta name="description" content="Deploy a custom AI voice agent that answers calls, books appointments, and routes inquiries 24/7. Built by RiftFactor." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            },
+            surface: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              800: '#1e1b2e',
+              850: '#171527',
+              900: '#0f0d1a',
+              950: '#0a0912',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    html { scroll-behavior: smooth; }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #818cf8 0%, #6366f1 30%, #a78bfa 70%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glow effects */
+    .glow-purple { box-shadow: 0 0 60px rgba(99, 102, 241, 0.15), 0 0 120px rgba(99, 102, 241, 0.05); }
+    .glow-card:hover { box-shadow: 0 0 40px rgba(99, 102, 241, 0.12); transform: translateY(-2px); }
+
+    /* Phone mockup */
+    .phone-frame {
+      background: linear-gradient(145deg, #2a2740, #1a1730);
+      border: 2px solid rgba(99, 102, 241, 0.3);
+      border-radius: 2.5rem;
+      padding: 0.75rem;
+      position: relative;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 60px rgba(99,102,241,0.1);
+    }
+    .phone-notch {
+      width: 40%;
+      height: 1.5rem;
+      background: #1a1730;
+      border-radius: 0 0 1rem 1rem;
+      position: absolute;
+      top: 0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    .phone-screen {
+      background: #0f0d1a;
+      border-radius: 2rem;
+      overflow: hidden;
+      min-height: 480px;
+    }
+
+    /* Chat bubbles */
+    .bubble-ai {
+      background: linear-gradient(135deg, #312e81, #3730a3);
+      border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
+    }
+    .bubble-user {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
+    }
+
+    /* Pulse ring animation */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+    .pulse-ring { animation: pulse-ring 2.5s ease-in-out infinite; }
+
+    /* Fade-in on scroll */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Step connector line */
+    .step-connector {
+      position: absolute;
+      top: 2.5rem;
+      left: calc(50% + 3rem);
+      width: calc(100% - 6rem);
+      height: 2px;
+      background: linear-gradient(90deg, #4f46e5, #a78bfa);
+      opacity: 0.3;
+    }
+
+    /* Industry card conversation */
+    .industry-convo {
+      background: rgba(15, 13, 26, 0.6);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+    }
+
+    /* Pricing popular badge */
+    .popular-badge {
+      background: linear-gradient(135deg, #6366f1, #a78bfa);
+    }
+
+    /* Subtle grid background */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+  </style>
+</head>
+<body class="bg-surface-950 text-white antialiased">
+
+  <!-- ==================== NAV ==================== -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-surface-950/80 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center">
+          <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+        </div>
+        <span class="text-lg font-bold tracking-tight">RiftFactor</span>
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
+        <a href="#industries" class="hover:text-white transition-colors">Industries</a>
+        <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+      </div>
+      <a href="#cta" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-600 hover:bg-brand-500 transition-colors text-sm font-semibold">
+        Get Started
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <section class="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden grid-bg">
+    <!-- Background glow -->
+    <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-brand-600/10 blur-[150px] pointer-events-none"></div>
+
+    <div class="relative max-w-7xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <!-- Left copy -->
+        <div class="fade-up">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-600/10 border border-brand-500/20 text-brand-300 text-sm font-medium mb-6">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            AI-Powered Voice Agents
+          </div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight mb-6">
+            AI Voice Agent<br />
+            <span class="gradient-text">for Your Business</span>
+          </h1>
+          <p class="text-lg text-gray-400 leading-relaxed max-w-lg mb-8">
+            Never miss a call again. Your AI receptionist answers 24/7, books appointments,
+            handles FAQs, and routes calls&mdash;in any language. Deployed in 48 hours.
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a href="#cta" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-brand-600 hover:bg-brand-500 transition-all text-base font-semibold shadow-lg shadow-brand-600/20">
+              Get Your Agent
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </a>
+            <a href="#how-it-works" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-white/10 hover:border-white/20 transition-colors text-base font-medium text-gray-300">
+              <i data-lucide="play-circle" class="w-5 h-5"></i>
+              See How It Works
+            </a>
+          </div>
+          <!-- Trust badges -->
+          <div class="flex items-center gap-6 mt-10 text-sm text-gray-500">
+            <span class="flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i> HIPAA Ready</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4 text-brand-400"></i> 48hr Deploy</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="globe" class="w-4 h-4 text-purple-400"></i> 30+ Languages</span>
+          </div>
+        </div>
+
+        <!-- Right: Phone mockup -->
+        <div class="fade-up flex justify-center lg:justify-end">
+          <div class="phone-frame w-[300px] glow-purple">
+            <div class="phone-notch"></div>
+            <div class="phone-screen p-4 pt-10 flex flex-col gap-3">
+              <!-- Chat header -->
+              <div class="flex items-center gap-3 pb-3 border-b border-white/5">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center">
+                  <i data-lucide="headphones" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold">AI Receptionist</p>
+                  <p class="text-xs text-emerald-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                    Active now
+                  </p>
+                </div>
+              </div>
+
+              <!-- Chat messages -->
+              <div class="bubble-ai px-4 py-3 max-w-[85%]">
+                <p class="text-sm leading-relaxed">Good morning! Thank you for calling Bright Smile Dental. How can I help you today?</p>
+              </div>
+              <div class="bubble-user px-4 py-3 max-w-[85%] ml-auto">
+                <p class="text-sm leading-relaxed">Hi, I need to schedule a cleaning for next week.</p>
+              </div>
+              <div class="bubble-ai px-4 py-3 max-w-[85%]">
+                <p class="text-sm leading-relaxed">I'd love to help! I have openings on Tuesday at 10am or Thursday at 2pm. Which works better?</p>
+              </div>
+              <div class="bubble-user px-4 py-3 max-w-[85%] ml-auto">
+                <p class="text-sm leading-relaxed">Thursday at 2pm, please.</p>
+              </div>
+              <div class="bubble-ai px-4 py-3 max-w-[85%]">
+                <p class="text-sm leading-relaxed">You're all set for Thursday at 2pm with Dr. Chen. I'll send a confirmation text shortly.</p>
+              </div>
+
+              <!-- Typing indicator -->
+              <div class="flex items-center gap-2 px-4 py-2 mt-1">
+                <div class="flex gap-1">
+                  <span class="w-2 h-2 rounded-full bg-brand-400 pulse-ring" style="animation-delay:0s"></span>
+                  <span class="w-2 h-2 rounded-full bg-brand-400 pulse-ring" style="animation-delay:0.3s"></span>
+                  <span class="w-2 h-2 rounded-full bg-brand-400 pulse-ring" style="animation-delay:0.6s"></span>
+                </div>
+                <span class="text-xs text-gray-500">AI is listening...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FEATURES ==================== -->
+  <section id="features" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 fade-up">
+        <p class="text-brand-400 text-sm font-semibold tracking-widest uppercase mb-3">Capabilities</p>
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">Everything Your Front Desk Does,<br class="hidden sm:block" /> But It Never Sleeps</h2>
+        <p class="text-gray-400 max-w-2xl mx-auto">Your AI voice agent handles the calls your team can't get to&mdash;nights, weekends, lunch rush, all of it.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Feature cards -->
+        <div class="fade-up p-6 rounded-2xl bg-surface-850 border border-white/5 glow-card transition-all duration-300">
+          <div class="w-12 h-12 rounded-xl bg-brand-600/15 flex items-center justify-center mb-4">
+            <i data-lucide="phone-incoming" class="w-6 h-6 text-brand-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">24/7 Call Answering</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Every call answered on the first ring. No voicemail, no hold music, no missed opportunities&mdash;day or night.</p>
+        </div>
+
+        <div class="fade-up p-6 rounded-2xl bg-surface-850 border border-white/5 glow-card transition-all duration-300" style="transition-delay:0.05s">
+          <div class="w-12 h-12 rounded-xl bg-emerald-600/15 flex items-center justify-center mb-4">
+            <i data-lucide="calendar-check" class="w-6 h-6 text-emerald-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Appointment Booking</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Checks real-time availability, books directly into your calendar, and sends confirmation texts automatically.</p>
+        </div>
+
+        <div class="fade-up p-6 rounded-2xl bg-surface-850 border border-white/5 glow-card transition-all duration-300" style="transition-delay:0.1s">
+          <div class="w-12 h-12 rounded-xl bg-amber-600/15 flex items-center justify-center mb-4">
+            <i data-lucide="message-circle-question" class="w-6 h-6 text-amber-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">FAQ Handling</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Trained on your business knowledge. Answers pricing, hours, services, directions, and policies instantly.</p>
+        </div>
+
+        <div class="fade-up p-6 rounded-2xl bg-surface-850 border border-white/5 glow-card transition-all duration-300" style="transition-delay:0.15s">
+          <div class="w-12 h-12 rounded-xl bg-rose-600/15 flex items-center justify-center mb-4">
+            <i data-lucide="route" class="w-6 h-6 text-rose-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Smart Call Routing</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Understands caller intent and routes to the right department or person. Escalates to a human when needed.</p>
+        </div>
+
+        <div class="fade-up p-6 rounded-2xl bg-surface-850 border border-white/5 glow-card transition-all duration-300" style="transition-delay:0.2s">
+          <div class="w-12 h-12 rounded-xl bg-cyan-600/15 flex items-center justify-center mb-4">
+            <i data-lucide="languages" class="w-6 h-6 text-cyan-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Multilingual Support</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Speaks 30+ languages fluently. Detects the caller's language automatically and switches mid-conversation.</p>
+        </div>
+
+        <div class="fade-up p-6 rounded-2xl bg-surface-850 border border-white/5 glow-card transition-all duration-300" style="transition-delay:0.25s">
+          <div class="w-12 h-12 rounded-xl bg-violet-600/15 flex items-center justify-center mb-4">
+            <i data-lucide="bar-chart-3" class="w-6 h-6 text-violet-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Analytics Dashboard</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">See every call, transcript, sentiment score, and booking in a real-time dashboard. Export reports anytime.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== HOW IT WORKS ==================== -->
+  <section id="how-it-works" class="py-24 bg-surface-900/50 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 fade-up">
+        <p class="text-brand-400 text-sm font-semibold tracking-widest uppercase mb-3">Process</p>
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">How It Works</h2>
+        <p class="text-gray-400 max-w-2xl mx-auto">Three simple steps. No code required. Your AI agent goes live in 48 hours.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 relative">
+        <!-- Connector lines (desktop only) -->
+        <div class="hidden md:block absolute top-16 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px bg-gradient-to-r from-brand-500/30 via-brand-500/50 to-brand-500/30"></div>
+
+        <!-- Step 1 -->
+        <div class="fade-up text-center">
+          <div class="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-600/15 border border-brand-500/20 mb-6">
+            <i data-lucide="phone-call" class="w-7 h-7 text-brand-400"></i>
+            <span class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-brand-600 text-xs font-bold flex items-center justify-center">1</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Call Comes In</h3>
+          <p class="text-sm text-gray-400 leading-relaxed max-w-xs mx-auto">A customer calls your business number. The AI agent picks up instantly&mdash;zero rings, zero wait.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="fade-up text-center" style="transition-delay:0.1s">
+          <div class="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-600/15 border border-purple-500/20 mb-6">
+            <i data-lucide="brain" class="w-7 h-7 text-purple-400"></i>
+            <span class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-purple-600 text-xs font-bold flex items-center justify-center">2</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">AI Understands</h3>
+          <p class="text-sm text-gray-400 leading-relaxed max-w-xs mx-auto">Advanced NLU identifies intent, extracts details, and holds a natural conversation&mdash;just like your best employee.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="fade-up text-center" style="transition-delay:0.2s">
+          <div class="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-600/15 border border-emerald-500/20 mb-6">
+            <i data-lucide="check-circle" class="w-7 h-7 text-emerald-400"></i>
+            <span class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-emerald-600 text-xs font-bold flex items-center justify-center">3</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Books, Routes, or Resolves</h3>
+          <p class="text-sm text-gray-400 leading-relaxed max-w-xs mx-auto">Appointments get booked, questions get answered, urgent calls get transferred. Every call has a resolution.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== INDUSTRIES ==================== -->
+  <section id="industries" class="py-24 relative grid-bg">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 fade-up">
+        <p class="text-brand-400 text-sm font-semibold tracking-widest uppercase mb-3">Industries</p>
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">Built for Your Industry</h2>
+        <p class="text-gray-400 max-w-2xl mx-auto">Pre-trained conversation models for the verticals that need voice automation most.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Dental -->
+        <div class="fade-up rounded-2xl bg-surface-850 border border-white/5 overflow-hidden glow-card transition-all duration-300">
+          <div class="p-6 pb-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-cyan-600/15 flex items-center justify-center">
+                <i data-lucide="smile" class="w-5 h-5 text-cyan-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Dental Offices</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Cleanings, emergencies, insurance questions&mdash;handled around the clock.</p>
+          </div>
+          <div class="industry-convo mx-4 mb-4 rounded-xl p-4 space-y-2.5">
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Dr. Park has an opening tomorrow at 9am. Shall I book that for your filling?"</p>
+            </div>
+            <div class="flex gap-2 items-start justify-end">
+              <p class="text-xs text-gray-400">"Yes, and can you check if my Delta Dental covers it?"</p>
+              <span class="shrink-0 text-xs text-gray-500 font-semibold mt-0.5">Caller</span>
+            </div>
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Absolutely. Delta Dental PPO covers fillings at 80%. I'll confirm and text you the details."</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal -->
+        <div class="fade-up rounded-2xl bg-surface-850 border border-white/5 overflow-hidden glow-card transition-all duration-300" style="transition-delay:0.05s">
+          <div class="p-6 pb-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-amber-600/15 flex items-center justify-center">
+                <i data-lucide="scale" class="w-5 h-5 text-amber-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Law Firms</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Intake screening, consultation booking, and after-hours urgent calls.</p>
+          </div>
+          <div class="industry-convo mx-4 mb-4 rounded-xl p-4 space-y-2.5">
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Thank you for calling Davis & Associates. What type of legal matter can we help with?"</p>
+            </div>
+            <div class="flex gap-2 items-start justify-end">
+              <p class="text-xs text-gray-400">"I was in a car accident last week and need to speak with someone."</p>
+              <span class="shrink-0 text-xs text-gray-500 font-semibold mt-0.5">Caller</span>
+            </div>
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"I'm sorry to hear that. I can schedule a free consultation with our personal injury team. Would tomorrow at 3pm work?"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real Estate -->
+        <div class="fade-up rounded-2xl bg-surface-850 border border-white/5 overflow-hidden glow-card transition-all duration-300" style="transition-delay:0.1s">
+          <div class="p-6 pb-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-emerald-600/15 flex items-center justify-center">
+                <i data-lucide="home" class="w-5 h-5 text-emerald-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Real Estate</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Listing inquiries, showing scheduling, and lead qualification on autopilot.</p>
+          </div>
+          <div class="industry-convo mx-4 mb-4 rounded-xl p-4 space-y-2.5">
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Hi! The listing on 742 Maple Drive is still available. It's 3 bed, 2 bath, listed at $485,000."</p>
+            </div>
+            <div class="flex gap-2 items-start justify-end">
+              <p class="text-xs text-gray-400">"Can I see it this weekend?"</p>
+              <span class="shrink-0 text-xs text-gray-500 font-semibold mt-0.5">Caller</span>
+            </div>
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Saturday at 11am or 2pm are both open. I'll book the showing and text you the address with directions."</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Restaurant -->
+        <div class="fade-up rounded-2xl bg-surface-850 border border-white/5 overflow-hidden glow-card transition-all duration-300" style="transition-delay:0.15s">
+          <div class="p-6 pb-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-rose-600/15 flex items-center justify-center">
+                <i data-lucide="utensils" class="w-5 h-5 text-rose-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Restaurants</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Reservations, takeout orders, allergy questions, and party booking.</p>
+          </div>
+          <div class="industry-convo mx-4 mb-4 rounded-xl p-4 space-y-2.5">
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Welcome to Bella Notte! Would you like to make a reservation or place a takeout order?"</p>
+            </div>
+            <div class="flex gap-2 items-start justify-end">
+              <p class="text-xs text-gray-400">"Reservation for 4 this Friday around 7."</p>
+              <span class="shrink-0 text-xs text-gray-500 font-semibold mt-0.5">Caller</span>
+            </div>
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Friday at 7pm for 4, confirmed! Any allergies or dietary preferences I should note for the kitchen?"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto Repair -->
+        <div class="fade-up rounded-2xl bg-surface-850 border border-white/5 overflow-hidden glow-card transition-all duration-300" style="transition-delay:0.2s">
+          <div class="p-6 pb-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-orange-600/15 flex items-center justify-center">
+                <i data-lucide="wrench" class="w-5 h-5 text-orange-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Auto Repair</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Service scheduling, status updates, estimates, and recall notifications.</p>
+          </div>
+          <div class="industry-convo mx-4 mb-4 rounded-xl p-4 space-y-2.5">
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"Thanks for calling Apex Auto. Are you calling about an existing repair or to schedule a new service?"</p>
+            </div>
+            <div class="flex gap-2 items-start justify-end">
+              <p class="text-xs text-gray-400">"My check engine light came on. Can I get in today?"</p>
+              <span class="shrink-0 text-xs text-gray-500 font-semibold mt-0.5">Caller</span>
+            </div>
+            <div class="flex gap-2 items-start">
+              <span class="shrink-0 text-xs text-brand-400 font-semibold mt-0.5">AI</span>
+              <p class="text-xs text-gray-300">"We have a diagnostic slot at 3:30pm today. It's a $49 diagnostic fee. Want me to book that for your vehicle?"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- +More CTA card -->
+        <div class="fade-up rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center p-8 text-center" style="transition-delay:0.25s">
+          <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-4">
+            <i data-lucide="plus" class="w-6 h-6 text-gray-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Your Industry</h3>
+          <p class="text-sm text-gray-400 mb-4">Healthcare, insurance, SaaS, hospitality, and more. We build custom agents for any vertical.</p>
+          <a href="#cta" class="text-brand-400 text-sm font-semibold hover:text-brand-300 transition-colors">Talk to us &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRICING ==================== -->
+  <section id="pricing" class="py-24 bg-surface-900/50 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 fade-up">
+        <p class="text-brand-400 text-sm font-semibold tracking-widest uppercase mb-3">Pricing</p>
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
+        <p class="text-gray-400 max-w-2xl mx-auto">No per-minute fees. No surprise charges. Every plan includes setup, training, and ongoing optimization.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+        <!-- Starter -->
+        <div class="fade-up rounded-2xl bg-surface-850 border border-white/5 p-8 flex flex-col">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-1">Starter</h3>
+            <p class="text-sm text-gray-400">For small businesses getting started</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold">$299</span>
+            <span class="text-gray-400 text-sm">/month</span>
+          </div>
+          <ul class="space-y-3 mb-8 flex-1">
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Up to 200 calls/month
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Appointment booking
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              FAQ handling (up to 50 Q&As)
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Basic analytics dashboard
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Email support
+            </li>
+          </ul>
+          <a href="#cta" class="block text-center py-3 rounded-xl border border-white/10 hover:border-brand-500/50 hover:bg-brand-600/10 transition-all font-semibold text-sm">
+            Get Started
+          </a>
+        </div>
+
+        <!-- Professional (Popular) -->
+        <div class="fade-up rounded-2xl bg-surface-850 border-2 border-brand-500/40 p-8 flex flex-col relative glow-purple" style="transition-delay:0.05s">
+          <div class="popular-badge absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold tracking-wide">
+            MOST POPULAR
+          </div>
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-1">Professional</h3>
+            <p class="text-sm text-gray-400">For growing businesses</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold">$599</span>
+            <span class="text-gray-400 text-sm">/month</span>
+          </div>
+          <ul class="space-y-3 mb-8 flex-1">
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Up to 1,000 calls/month
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Appointment + call routing
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Unlimited FAQ knowledge base
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Multilingual (10 languages)
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              CRM integration
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Priority support + Slack channel
+            </li>
+          </ul>
+          <a href="#cta" class="block text-center py-3 rounded-xl bg-brand-600 hover:bg-brand-500 transition-colors font-semibold text-sm">
+            Get Started
+          </a>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="fade-up rounded-2xl bg-surface-850 border border-white/5 p-8 flex flex-col" style="transition-delay:0.1s">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-1">Enterprise</h3>
+            <p class="text-sm text-gray-400">For multi-location operations</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold">Custom</span>
+          </div>
+          <ul class="space-y-3 mb-8 flex-1">
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Unlimited calls
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Multi-location support
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              30+ languages
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Custom integrations (EHR, PMS, etc.)
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              Dedicated success manager
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-300">
+              <i data-lucide="check" class="w-4 h-4 text-brand-400 shrink-0 mt-0.5"></i>
+              SLA + HIPAA compliance
+            </li>
+          </ul>
+          <a href="#cta" class="block text-center py-3 rounded-xl border border-white/10 hover:border-brand-500/50 hover:bg-brand-600/10 transition-all font-semibold text-sm">
+            Contact Sales
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CTA ==================== -->
+  <section id="cta" class="py-24 relative overflow-hidden">
+    <!-- Background glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-brand-600/10 blur-[150px] pointer-events-none"></div>
+
+    <div class="relative max-w-3xl mx-auto px-6 text-center fade-up">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-600/15 border border-brand-500/20 mb-8">
+        <i data-lucide="rocket" class="w-8 h-8 text-brand-400"></i>
+      </div>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+        Get Your AI Agent<br />
+        <span class="gradient-text">in 48 Hours</span>
+      </h2>
+      <p class="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
+        Stop losing calls. Stop losing revenue. We'll build, train, and deploy a custom AI voice agent for your business&mdash;in two days flat.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="mailto:hello@riftfactor.com" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-brand-600 hover:bg-brand-500 transition-all text-base font-semibold shadow-lg shadow-brand-600/25">
+          <i data-lucide="mail" class="w-5 h-5"></i>
+          Book a Demo
+        </a>
+        <a href="tel:+1-555-RIFT" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-white/10 hover:border-white/20 transition-colors text-base font-medium text-gray-300">
+          <i data-lucide="phone" class="w-5 h-5"></i>
+          Call Us (Talk to Our AI!)
+        </a>
+      </div>
+      <p class="text-sm text-gray-500 mt-6">No contracts. Cancel anytime. 14-day money-back guarantee.</p>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="py-12 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center">
+            <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+          </div>
+          <span class="text-lg font-bold tracking-tight">RiftFactor</span>
+        </div>
+        <div class="flex items-center gap-8 text-sm text-gray-500">
+          <a href="#features" class="hover:text-gray-300 transition-colors">Features</a>
+          <a href="#industries" class="hover:text-gray-300 transition-colors">Industries</a>
+          <a href="#pricing" class="hover:text-gray-300 transition-colors">Pricing</a>
+          <a href="mailto:hello@riftfactor.com" class="hover:text-gray-300 transition-colors">Contact</a>
+        </div>
+        <p class="text-sm text-gray-600">&copy; 2026 RiftFactor. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Fade-up on scroll (Intersection Observer)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    document.querySelectorAll('.fade-up').forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>
